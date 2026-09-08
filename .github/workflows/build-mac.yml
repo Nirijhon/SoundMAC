@@ -1,0 +1,34 @@
+name: Build Mac App
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build-mac:
+    runs-on: macos-latest
+    steps:
+      - name: Kunin ang code
+        uses: actions/checkout@v4
+
+      - name: I-setup ang Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: I-install ang dependencies
+        run: npm install
+
+      - name: I-build ang .dmg
+        run: npm run dist:mac
+        env:
+          # Walang Apple Developer signing — gumagawa na lang ng unsigned app
+          # (bukas pa rin via right-click → Open; tingnan ang README STEP 6)
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: I-upload ang installer (artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Soundboard-Mac-Installer
+          path: |
+            dist/*.dmg
+            dist/*.zip
+          if-no-files-found: error
